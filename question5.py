@@ -1,10 +1,9 @@
 import random
 import math
 
-
 class question5():
 	def mutation(self, X: str, chi: float, rep: int):
-		mu = chi
+		mu = chi / len(X)
 		for i in range(0, rep):
 			X = list(X)
 			for i in range(0, len(X)):
@@ -87,21 +86,26 @@ class question5():
 		if ans[1] == n:
 			return n, chi, Lambda, k, rep, ans[1], ans[0]
 		else:
-			while not ans[1] == n:
-				rep = rep + 1
-				X1, X = self.tournament(X, k, 1)
-				X1[0] = self.crossover(X1[0], X1[1], 1)
-				X1[1] = self.crossover(X1[0], X1[1], 1)
-				X1[0] = self.mutation(X1[0], chi, 1)
-				X1[1] = self.mutation(X1[1], chi, 1)
-				X.extend(X1)
-				X_eva = []
-				for i in range(len(X)):
-					X_eva.append(self.oneMAX(X[i]))
-				Out = list(zip(X, X_eva))
-				Out.sort(key=lambda x: x[1], reverse=True)
+			while not int(ans[1]) == n:
+				if rep <= 20000:
+					rep = rep + 1
+					X1, X = self.tournament(X, k, 1)
+					X1[0] = self.crossover(X1[0], X1[1], 1)
+					X1[1] = self.crossover(X1[0], X1[1], 1)
+					X1[0] = self.mutation(X1[0], chi, 1)
+					X1[1] = self.mutation(X1[1], chi, 1)
+					X.extend(X1)
+					X_eva = []
+					for i in range(len(X)):
+						X_eva.append(self.oneMAX(X[i]))
+					Out = list(zip(X, X_eva))
+					Out.sort(key=lambda x: x[1], reverse=True)
 				# print(Out)
-				ans = Out[0]
+					ans = Out[0]
+					print(ans[1],rep)
+				else:
+					break
+					return 'cirlce limits'
 			# print(ans)
 			return n, chi, Lambda, k, rep, ans[1], ans[0]
 
@@ -113,13 +117,13 @@ app = question5()
 # k = int(input('please input k: '))
 # rep = int(input('please input rep: '))
 X = app.create(200, 100)
-#print(X)
+# print(X)
 Y = app.mutation(X[1], 0.2, 4)
 # print(Y)
 Z = app.crossover(X[3], X[4], 4)
 # print(Z)
 Sigma = app.tournament(X, 2, 4)
 # print(Sigma)
-chi = 0.2
-print(app.Genetic(chi, 200, 100, 2, 4))
-# print(app.create(50,20))
+chi = 2
+
+print(app.Genetic(chi, n=10, Lambda=10, k=2, Rep=4))
