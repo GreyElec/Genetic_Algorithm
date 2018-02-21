@@ -6,8 +6,9 @@ Created on Fri Feb 16 21:11:18 2018
 import math
 import random
 import sys
+import time
 
-sys.setrecursionlimit(10000)
+sys.setrecursionlimit(5000)
 
 
 class Maxsatis():
@@ -75,11 +76,13 @@ class Excute(Maxsatis):
 
 
 class Genetic(Excute):
-	def __init__(self, path):
+	def __init__(self, path, time_budget):
 		super().__init__(path)
 		self.mu = 0.2
-		self.Generation = 0
-		self.population = 20
+		self.Generation = 1
+		self.population = 200
+		self.timelimit = time_budget
+		self.time1 = time.clock()
 
 	def Mute(self, input: str):
 		return ''.join(
@@ -105,22 +108,19 @@ class Genetic(Excute):
 		ordered, wasted = zip(*ordered)
 		ordered = list(ordered)
 		ordered[0], ordered[1] = x_new, y_new
-		assignment_eval = (sorted(zip(ordered, map(self.excute, ordered)), key=lambda x: x[1], reverse=True))
-		try:
-			if assignment_eval[0][1] == 4:
+		assignment_eval = sorted(zip(ordered, map(self.excute, ordered)), key=lambda x: x[1], reverse=True)
+		self.time2 = time.clock()
+		if self.time2 - self.time1 <= self.timelimit:
+			if self.Generation >= 3000:
 				m = self.Generation
-				self.Generation = 0
-				return m, assignment_eval[0]
-			elif self.Generation >= 3000:
-				m = self.Generation
-				self.Generation = 0
+				self.Generation = 1
 				return m, assignment_eval[0]
 			else:
 				self.Generation = self.Generation + 1
 			return self.GeneticRun(ordered)
-		except(RecursionError):
+		else:
 			m = self.Generation
-			self.Generation = 0
+			self.Generation = 1
 			return m, assignment_eval[0]
 
 
@@ -134,12 +134,41 @@ clause = '0.5 2 1 3 4 0'
 clause = clause.split(' ')[1:-1]
 clause = list(map(int, clause))
 test.question1('1234', clause)
-'''
 
-path = r'C:\Users\Silver\Desktop\example.wcnf'
+
+path = r''C:\\Users\Silver\Desktop\example.wcnf'
 m = Excute(path)
 m.excute('0000')
 
-g = Genetic(path)
+g = Genetic(path, 100)
 assignment = g.popCreate()
-print(g.GeneticRun(assignment))
+a, (b, c) = g.GeneticRun(assignment)
+print(a * g.population, b, c)
+'''
+
+
+class Run():
+	def Choice(self, question, clause=None, assignment=None, path=None, time_budgt=None, repetation=None):
+		if question == 1:
+			clause = clause.split(' ')[1:-1]
+			clause = list(map(int, clause))
+			test = Maxsatis()
+			print(int(test.question1(assignment=assignment, clause=clause)))
+		elif question == 2:
+			m = Excute(path)
+			print(m.excute(assignment))
+		else:
+			for i in range(repetation):
+				g = Genetic(path, time_budgt)
+				assignment = g.popCreate()
+				a, (b, c) = g.GeneticRun(assignment)
+				print(a * g.population, c, b)
+
+
+path = r'C:\Users\Silver\Desktop\example.wcnf'
+assignment = '1011'
+clause = '0.5 2 1 -4 -3 0'
+r = Run()
+r.Choice(question=3, path=r'C:\Users\Silver\Desktop\example.wcnf', time_budgt=1, repetation=10)
+r.Choice(path=path, question=2, assignment=assignment)
+r.Choice(clause=clause, question=1, assignment=assignment)
