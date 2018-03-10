@@ -13,13 +13,13 @@ sys.setrecursionlimit(5000)
 
 class Maxsatis():
 	'''
-		def __init__(self, question  : int, clause: str, assignment: str):
-			self.question = question
-			self.clause = list(map(int, clause.split(' ')[1:-1]))
-			self.assignment = list(map(int, list(assignment)))
-			self.value = list(map(int, list(map(math.fabs, self.clause))))
-			self.sign = list(map(int, list(map(lambda x: x / math.fabs(x), self.clause))))
-			self.question1(self.assignment,self.sign,self.value)
+			def __init__(self, question  : int, clause: str, assignment: str):
+				self.question = question
+				self.clause = list(map(int, clause.split(' ')[1:-1]))
+				self.assignment = list(map(int, list(assignment)))
+				self.value = list(map(int, list(map(math.fabs, self.clause))))
+				self.sign = list(map(int, list(map(lambda x: x / math.fabs(x), self.clause))))
+				self.question1(self.assignment,self.sign,self.value)
 	'''
 
 	def parameter(self, clause: str):
@@ -53,7 +53,7 @@ class Excute(Maxsatis):
 
 		def func(s: list):
 			if s[0] == 'p':
-				i, j = s[-2], s[-1]
+				i, j = s[2], s[3]
 				return i, j
 
 		i, j = map(int, list(filter(None, map(func, data)))[0])  # 取出数据中的第二行 确定条件数和条件条数
@@ -95,11 +95,12 @@ class Genetic(Excute):
 		return self.excute(assignment)
 
 	def popCreate(self):
-		return [''.join(['1' if random.random() > 0.5 else '0' for i in range(4)]) for j in range(self.population)]
+		return [''.join(['1' if random.random() > 0.5 else '0' for i in range(self.length)]) for j in
+		        range(self.population)]
 
 	def GeneticRun(self, assignment: list):
 		# print('Runing')
-		ordered = (sorted(zip(assignment, map(self.excute, assignment)), key=lambda x: x[1], reverse=True))
+		ordered = (sorted(zip(assignment, map(self.evaluate, assignment)), key=lambda x: x[1], reverse=True))
 		x, y = ordered[0][0], ordered[1][0]
 		x_new = self.crossOver(x, y)
 		y_new = self.crossOver(x, y)
@@ -108,7 +109,7 @@ class Genetic(Excute):
 		ordered, wasted = zip(*ordered)
 		ordered = list(ordered)
 		ordered[0], ordered[1] = x_new, y_new
-		assignment_eval = sorted(zip(ordered, map(self.excute, ordered)), key=lambda x: x[1], reverse=True)
+		assignment_eval = sorted(zip(ordered, map(self.evaluate, ordered)), key=lambda x: x[1], reverse=True)
 		self.time2 = time.clock()
 		if self.time2 - self.time1 <= self.timelimit:
 			if self.Generation >= 3000:
@@ -117,7 +118,7 @@ class Genetic(Excute):
 				return m, assignment_eval[0]
 			else:
 				self.Generation = self.Generation + 1
-			return self.GeneticRun(ordered)
+				return self.GeneticRun(ordered)
 		else:
 			m = self.Generation
 			self.Generation = 1
@@ -165,10 +166,10 @@ class Run():
 				print(a * g.population, c, b)
 
 
-path = r'C:\Users\Silver\Desktop\example.wcnf'
+path = 'C:\\Users\\Silver\\Desktop\\sanr400_0.7.clq.wcnf'
 assignment = '1011'
 clause = '0.5 2 1 -4 -3 0'
 r = Run()
-r.Choice(question=3, path=r'C:\Users\Silver\Desktop\example.wcnf', time_budgt=1, repetation=10)
-r.Choice(path=path, question=2, assignment=assignment)
-r.Choice(clause=clause, question=1, assignment=assignment)
+r.Choice(question=1, clause=clause, assignment=assignment)
+r.Choice(question=2, path=path, assignment=assignment)
+r.Choice(question=3, path=path, time_budgt=10, repetation=10)
